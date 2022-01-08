@@ -3,16 +3,44 @@ package core
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/cloudinary/cloudinary-go"
 	"github.com/cloudinary/cloudinary-go/api/admin"
 	"github.com/cloudinary/cloudinary-go/api/uploader"
+	"github.com/joho/godotenv"
 )
 
-func GetImage(publicID string) {
+type ENV struct {
+	cloudName string
+	apiKey    string
+	apiSecret string
+}
+
+func getENV() ENV {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	env := ENV{
+		cloudName: os.Getenv("CLOUD_NAME"),
+		apiKey:    os.Getenv("API_KEY"),
+		apiSecret: os.Getenv("API_SECRET"),
+	}
+
+	return env
+}
+
+func GetImage(folderName string, publicID string) {
+	if folderName != "" {
+		publicID = folderName + "/" + publicID
+	}
+	// get env variables
+	env := getENV()
 	// Start by creating a new instance of Cloudinary using CLOUDINARY_URL environment variable.
 	// Alternatively you can use cloudinary.NewFromParams() or cloudinary.NewFromURL().
-	var cld, err = cloudinary.NewFromParams("degodfgeg", "137376698295996", "0OsvPApvni3ESeEuUueGmfjJEaQ")
+	var cld, err = cloudinary.NewFromParams(env.cloudName, env.apiKey, env.apiSecret)
 	if err != nil {
 		log.Fatalf("Failed to intialize Cloudinary, %v", err)
 	}
@@ -33,9 +61,11 @@ func UploadImage(folderName string, imgURL string, publicID string) {
 		publicID = folderName + "/" + publicID
 	}
 
+	// get env variables
+	env := getENV()
 	// Start by creating a new instance of Cloudinary using CLOUDINARY_URL environment variable.
 	// Alternatively you can use cloudinary.NewFromParams() or cloudinary.NewFromURL().
-	var cld, err = cloudinary.NewFromParams("degodfgeg", "137376698295996", "0OsvPApvni3ESeEuUueGmfjJEaQ")
+	var cld, err = cloudinary.NewFromParams(env.cloudName, env.apiKey, env.apiSecret)
 	if err != nil {
 		log.Fatalf("Failed to intialize Cloudinary, %v", err)
 	}
