@@ -1,4 +1,4 @@
-package core
+package utils
 
 import (
 	"errors"
@@ -9,17 +9,19 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type Payload struct {
-	BoundingBox struct {
-		TopRow    float64 `json:"top_row"`
-		RightCol  float64 `json:"right_col"`
-		BottomRow float64 `json:"bottom_row"`
-		LeftCol   float64 `json:"left_col"`
-	} `json:"bounding_box"`
-	ImageUrl string `json:"image_url"`
+type BoundingBox struct {
+	TopRow    float64 `json:"top_row"`
+	RightCol  float64 `json:"right_col"`
+	BottomRow float64 `json:"bottom_row"`
+	LeftCol   float64 `json:"left_col"`
 }
 
-func getImageBox(c *fiber.Ctx) error {
+type Payload struct {
+	BoundingBox BoundingBox
+	ImageUrl    string `json:"image_url"`
+}
+
+func GetImageBox(c *fiber.Ctx) error {
 	payload := new(Payload)
 	err := c.BodyParser(payload)
 	if err != nil {

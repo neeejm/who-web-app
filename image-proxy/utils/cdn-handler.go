@@ -1,46 +1,25 @@
-package core
+package utils
 
 import (
 	"context"
 	"log"
-	"os"
 
 	"github.com/cloudinary/cloudinary-go"
 	"github.com/cloudinary/cloudinary-go/api/admin"
 	"github.com/cloudinary/cloudinary-go/api/uploader"
-	"github.com/joho/godotenv"
 )
 
-type ENV struct {
-	cloudName string
-	apiKey    string
-	apiSecret string
-}
-
-func getENV() ENV {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	env := ENV{
-		cloudName: os.Getenv("CLOUD_NAME"),
-		apiKey:    os.Getenv("API_KEY"),
-		apiSecret: os.Getenv("API_SECRET"),
-	}
-
-	return env
-}
-
-func GetImage(folderName string, publicID string) {
+// get an image from the cloundinary cdn
+// take the folder where the image is and the ID of the image
+func GetImage(folderName string, publicID string) string {
 	if folderName != "" {
 		publicID = folderName + "/" + publicID
 	}
 	// get env variables
-	env := getENV()
+	env := GetENV()
 	// Start by creating a new instance of Cloudinary using CLOUDINARY_URL environment variable.
 	// Alternatively you can use cloudinary.NewFromParams() or cloudinary.NewFromURL().
-	var cld, err = cloudinary.NewFromParams(env.cloudName, env.apiKey, env.apiSecret)
+	var cld, err = cloudinary.NewFromParams(env.CloudName, env.ApiKey, env.ApiSecret)
 	if err != nil {
 		log.Fatalf("Failed to intialize Cloudinary, %v", err)
 	}
@@ -54,18 +33,24 @@ func GetImage(folderName string, publicID string) {
 
 	// Print some basic information about the asset.
 	log.Printf("Public ID: %v, URL: %v\n", asset.PublicID, asset.SecureURL)
+	return asset.SecureURL
 }
 
-func UploadImage(folderName string, imgURL string, publicID string) {
+// upload an image to the cloudinary cdn
+// take the folder to upload to in the cdn, image(URL) to upload and the ID to use for the image in the cdn
+func UploadImage(folderName string, imgURL string, publicID string) string {
+	log.Println("folder: " + folderName)
+	log.Println("id: " + publicID)
+	log.Println("url: " + imgURL)
 	if folderName != "" {
 		publicID = folderName + "/" + publicID
 	}
 
 	// get env variables
-	env := getENV()
+	env := GetENV()
 	// Start by creating a new instance of Cloudinary using CLOUDINARY_URL environment variable.
 	// Alternatively you can use cloudinary.NewFromParams() or cloudinary.NewFromURL().
-	var cld, err = cloudinary.NewFromParams(env.cloudName, env.apiKey, env.apiSecret)
+	var cld, err = cloudinary.NewFromParams(env.CloudName, env.ApiKey, env.ApiSecret)
 	if err != nil {
 		log.Fatalf("Failed to intialize Cloudinary, %v", err)
 	}
@@ -77,9 +62,11 @@ func UploadImage(folderName string, imgURL string, publicID string) {
 		ctx,
 		imgURL,
 		uploader.UploadParams{PublicID: publicID})
+	log.Println(publicID)
 	if err != nil {
 		log.Fatalf("Failed to upload file, %v\n", err)
 	}
 
 	log.Println(uploadResult.SecureURL)
+	return uploadResult.SecureURL
 }
