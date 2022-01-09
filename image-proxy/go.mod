@@ -8,6 +8,13 @@ require (
 )
 
 require (
+	github.com/fogleman/gg v1.3.0 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/neeejm/image-box v0.0.0-20220108100843-47ecb0d2ed02 // indirect
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
+)
+
+require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/creasty/defaults v1.5.1 // indirect
 	github.com/google/uuid v1.2.0 // indirect

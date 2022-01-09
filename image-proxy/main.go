@@ -5,7 +5,6 @@ import (
 	"proxy/core"
 
 	"github.com/gofiber/fiber/v2"
-	// ib "github.com/neeejm/image-box/utils"
 )
 
 func main() {

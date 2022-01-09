@@ -2,11 +2,15 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	ib "github.com/neeejm/image-box/utils"
 )
 
 // part of the structure(json) of the clarifai api response
@@ -46,30 +50,32 @@ func Fetch(URL string) string {
 	requestOptions := strings.NewReader(fmt.Sprintf(`
 		{
 			"user_app_id": {
-				"user_id": %s,
+				"user_id": "%s",
 				"app_id": "%s"
 			},
 			"inputs": [
 				{
 					"data": {
 						"image": {
-							"url": "https://samples.clarifai.com/metro-north.jpg"
+							"url": "%s"
 						}
 					}
 				}
 			]
 		}
-	`, env.ClarifaiUserID, env.ClarifaiAppID))
+	`, env.ClarifaiUserID, env.ClarifaiAppID, URL))
 
-	req, err := http.NewRequest("POST", URL, requestOptions)
+	clarifaiApiURL := "https://api.clarifai.com/v2/models/f76196b43bbd45c99b4f3cd8e8b40a8a/versions/45fb9a671625463fa646c3523a3087d5/outputs?"
+	req, err := http.NewRequest("POST", clarifaiApiURL, requestOptions)
 	if err != nil {
 		panic(err)
 	}
 	req.Header.Set("user-agent", "golang application")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Key 0f90fc9066624052ae143cd96bf5e9f0")
+	req.Header.Add("Authorization", "Key "+env.ClarifaiApiKey)
 	response, err := client.Do(req)
 	if err != nil {
+		log.Println("me")
 		panic(err)
 	}
 	defer response.Body.Close()
@@ -80,15 +86,20 @@ func Fetch(URL string) string {
 // get the coordinates the detected face
 // takes clarifai api response as param
 // return the coordinates as a box(BoundinBox)
-func GetBoundingBox(jsonData string) BoundingBox {
+func GetBoundingBox(jsonData string) (ib.Box, error) {
 	data := clarifaiResponse{}
 	json.Unmarshal([]byte(jsonData), &data)
+
+	if len(data.Outputs) == 0 || len(data.Outputs[0].Data.Regions) == 0 {
+		return ib.Box{}, errors.New("Empty data")
+	}
+
 	box := data.Outputs[0].Data.Regions[0].RegionInfo.BoundingBox
 
-	return BoundingBox{
+	return ib.Box{
 		TopRow:    box.TopRow,
 		RightCol:  box.RightCol,
 		BottomRow: box.BottomRow,
 		LeftCol:   box.LeftCol,
-	}
+	}, nil
 }

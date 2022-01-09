@@ -2,7 +2,11 @@ package utils
 
 import (
 	"context"
+	"errors"
+	"io"
 	"log"
+	"net/http"
+	"os"
 
 	"github.com/cloudinary/cloudinary-go"
 	"github.com/cloudinary/cloudinary-go/api/admin"
@@ -39,9 +43,6 @@ func GetImage(folderName string, publicID string) string {
 // upload an image to the cloudinary cdn
 // take the folder to upload to in the cdn, image(URL) to upload and the ID to use for the image in the cdn
 func UploadImage(folderName string, imgURL string, publicID string) string {
-	log.Println("folder: " + folderName)
-	log.Println("id: " + publicID)
-	log.Println("url: " + imgURL)
 	if folderName != "" {
 		publicID = folderName + "/" + publicID
 	}
@@ -69,4 +70,31 @@ func UploadImage(folderName string, imgURL string, publicID string) string {
 
 	log.Println(uploadResult.SecureURL)
 	return uploadResult.SecureURL
+}
+
+func DownloadImage(URL, fileName string) error {
+	//Get the response bytes from the url
+	response, err := http.Get(URL)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		return errors.New("Received non 200 response code")
+	}
+	//Create a empty file
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	//Write the bytes to the fiel
+	_, err = io.Copy(file, response.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
