@@ -1,6 +1,7 @@
 package core
 
 import (
+	"io/ioutil"
 	ut "proxy/utils"
 	"time"
 
@@ -17,7 +18,7 @@ type Image struct {
 }
 
 type ImageBox struct {
-	URL          string `json:"url"`
+	URL          []byte `json:"url"`
 	BoundingBox  ib.Box `json:"bounding_box"`
 	CreationDate string `json:"creation_date"`
 }
@@ -132,13 +133,22 @@ func drawBox(c *fiber.Ctx) error {
 	ut.DownloadImage(url, "face.png")
 
 	// draw a box around the face
+	box.LineWidth = 10
+	// box.LineColor = "#ff3333"
 	ib.DrawBox("face.png", box)
+
+	// return image buffer
+	data, err := ioutil.ReadFile("out.png")
+	if err != nil {
+		return err
+	}
+	// fmt.Println("byte slice data", data)
 
 	return c.Status(fiber.StatusOK).JSON(SuccessfulDrawing{
 		StatusCode:  c.Response().StatusCode(),
 		Description: "Box drawen successfully.",
 		ImageBox: ImageBox{
-			URL:          "",
+			URL:          data,
 			BoundingBox:  box,
 			CreationDate: time.Now().Format("2006-01-02"),
 		},

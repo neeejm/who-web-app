@@ -21,7 +21,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "proxy": "lcp --proxyUrl https://www.who.local --origin http://localhost:3003"
   },
   "eslintConfig": {
     "extends": [
@@ -40,5 +41,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "local-cors-proxy": "^1.1.0"
   }
 }
