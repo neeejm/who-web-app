@@ -5,6 +5,7 @@ import (
 	"proxy/core"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func main() {
@@ -12,6 +13,7 @@ func main() {
 
 	// server
 	app := fiber.New()
+	app.Use(recover.New())
 	core.UseRoutes(app)
 	app.Listen(":3003")
 }
