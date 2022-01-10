@@ -24,3 +24,7 @@
 
 // golang
 **/.env*
+
+// img
+**/face.png
+**/out.png
