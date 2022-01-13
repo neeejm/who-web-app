@@ -10,7 +10,7 @@ require (
 require (
 	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/neeejm/image-box v0.0.0-20220108100843-47ecb0d2ed02 // indirect
+	github.com/neeejm/image-box v0.0.0-20220113113504-e89c75e66e47 // indirect
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 )
 
