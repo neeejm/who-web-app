@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"io/ioutil"
 	ut "proxy/utils"
 	"time"
@@ -17,8 +18,9 @@ type Image struct {
 	CreationDate string `json:"creation_date"`
 }
 
-type ImageBox struct {
-	URL          []byte   `json:"url"`
+type Images struct {
+	ImageBox     []byte   `json:"image_box"`
+	Faces        [][]byte `json:"faces"`
 	BoundingBox  []ib.Box `json:"bounding_box"`
 	CreationDate string   `json:"creation_date"`
 }
@@ -30,15 +32,17 @@ type SuccessfulUpload struct {
 }
 
 type SuccessfulDrawing struct {
-	StatusCode  int      `json:"status_code"`
-	Description string   `json:"description"`
-	ImageBox    ImageBox `json:"image"`
+	StatusCode  int    `json:"status_code"`
+	Description string `json:"description"`
+	Images      Images `json:"images"`
 }
 
 type RequestError struct {
 	StatusCode  int    `json:"status_code"`
 	Description string `json:"description"`
 }
+
+var tmpDir string = "tmp/"
 
 func UseRoutes(app *fiber.App) {
 	// app.Use(logger.New())
@@ -107,6 +111,8 @@ func uploadImage(c *fiber.Ctx) error {
 }
 
 func drawBox(c *fiber.Ctx) error {
+	defaultPNG := "face.png"
+	defaultOutputPNG := "out.png"
 	url := c.Query("url")
 
 	// check if url is given in the query param
@@ -130,27 +136,37 @@ func drawBox(c *fiber.Ctx) error {
 	}
 
 	// download image
-	ut.DownloadImage(url, "face.png")
+	ut.DownloadImage(url, tmpDir+defaultPNG)
 
 	// draw a box around the face
-	// for _, b := range box {
-	// 	b.LineWidth = 10
-	// }
-	// box.LineColor = "#ff3333"
-	ib.DrawBox("face.png", box)
+	ib.DrawBox(tmpDir+defaultPNG, box, tmpDir+defaultOutputPNG)
 
-	// return image buffer
-	data, err := ioutil.ReadFile("out.png")
+	imageBoxData, err := ioutil.ReadFile(tmpDir + defaultOutputPNG)
 	if err != nil {
 		return err
 	}
-	// fmt.Println("byte slice data", data)
+	// return image buffer
+	facesData := [][]byte{}
+	// crop faces
+	count := 0
+	for _, b := range box {
+		count++
+		imgName := fmt.Sprintf(tmpDir+"cropped-face-%d.png", count)
+		ib.CropImage(tmpDir+defaultPNG, b, imgName)
+		data, err := ioutil.ReadFile(imgName)
+		if err != nil {
+			return err
+		}
+		facesData = append(facesData, data)
+		// fmt.Println("byte slice data", data)
+	}
 
 	return c.Status(fiber.StatusOK).JSON(SuccessfulDrawing{
 		StatusCode:  c.Response().StatusCode(),
 		Description: "Box drawen successfully.",
-		ImageBox: ImageBox{
-			URL:          data,
+		Images: Images{
+			ImageBox:     imageBoxData,
+			Faces:        facesData,
 			BoundingBox:  box,
 			CreationDate: time.Now().Format("2006-01-02"),
 		},
