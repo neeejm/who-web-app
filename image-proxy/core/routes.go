@@ -18,9 +18,9 @@ type Image struct {
 }
 
 type ImageBox struct {
-	URL          []byte `json:"url"`
-	BoundingBox  ib.Box `json:"bounding_box"`
-	CreationDate string `json:"creation_date"`
+	URL          []byte   `json:"url"`
+	BoundingBox  []ib.Box `json:"bounding_box"`
+	CreationDate string   `json:"creation_date"`
 }
 
 type SuccessfulUpload struct {
@@ -133,7 +133,9 @@ func drawBox(c *fiber.Ctx) error {
 	ut.DownloadImage(url, "face.png")
 
 	// draw a box around the face
-	box.LineWidth = 10
+	for _, b := range box {
+		b.LineWidth = 10
+	}
 	// box.LineColor = "#ff3333"
 	ib.DrawBox("face.png", box)
 

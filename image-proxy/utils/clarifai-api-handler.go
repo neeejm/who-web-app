@@ -86,20 +86,25 @@ func Fetch(URL string) string {
 // get the coordinates the detected face
 // takes clarifai api response as param
 // return the coordinates as a box(BoundinBox)
-func GetBoundingBox(jsonData string) (ib.Box, error) {
+func GetBoundingBox(jsonData string) ([]ib.Box, error) {
 	data := clarifaiResponse{}
 	json.Unmarshal([]byte(jsonData), &data)
 
 	if len(data.Outputs) == 0 || len(data.Outputs[0].Data.Regions) == 0 {
-		return ib.Box{}, errors.New("Empty data")
+		return nil, errors.New("Empty data")
 	}
 
-	box := data.Outputs[0].Data.Regions[0].RegionInfo.BoundingBox
+	regions := data.Outputs[0].Data.Regions
+	box := []ib.Box{}
 
-	return ib.Box{
-		TopRow:    box.TopRow,
-		RightCol:  box.RightCol,
-		BottomRow: box.BottomRow,
-		LeftCol:   box.LeftCol,
-	}, nil
+	for _, r := range regions {
+		box = append(box, ib.Box{
+			TopRow:    r.RegionInfo.BoundingBox.TopRow,
+			RightCol:  r.RegionInfo.BoundingBox.RightCol,
+			BottomRow: r.RegionInfo.BoundingBox.BottomRow,
+			LeftCol:   r.RegionInfo.BoundingBox.LeftCol,
+		})
+	}
+
+	return box, nil
 }
