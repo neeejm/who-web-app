@@ -26,10 +26,10 @@ github.com/joho/godotenv v1.4.0/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwA
 github.com/klauspost/compress v1.13.4/go.mod h1:8dP1Hq4DHOhN9w426knH3Rhby4rFm6D8eO+e+Dq5Gzg=
 github.com/klauspost/compress v1.13.6 h1:P76CopJELS0TiO2mebmnzgWaajssP/EszplttgQxcgc=
 github.com/klauspost/compress v1.13.6/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
-github.com/neeejm/image-box v0.0.0-20220108100843-47ecb0d2ed02 h1:k7YLBJooug94JZUa4HsRWP3exFST4dnZ3VqEMs78Y+k=
-github.com/neeejm/image-box v0.0.0-20220108100843-47ecb0d2ed02/go.mod h1:guPlq+QSU4pNVXdPg9GoNEjwgtkBqo9DVHFxjzDHVSY=
 github.com/neeejm/image-box v0.0.0-20220113113504-e89c75e66e47 h1:MnFshMH/U11qyXqOD5rVYoMHFURJ6HC6iDD/Ve7Gud0=
 github.com/neeejm/image-box v0.0.0-20220113113504-e89c75e66e47/go.mod h1:guPlq+QSU4pNVXdPg9GoNEjwgtkBqo9DVHFxjzDHVSY=
+github.com/neeejm/image-box v1.0.1 h1:3cadLKnWk1niJFlqsG/wPthEJQZ2Xd3mz7nsyaO+0FQ=
+github.com/neeejm/image-box v1.0.1/go.mod h1:guPlq+QSU4pNVXdPg9GoNEjwgtkBqo9DVHFxjzDHVSY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

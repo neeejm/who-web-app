@@ -133,9 +133,9 @@ func drawBox(c *fiber.Ctx) error {
 	ut.DownloadImage(url, "face.png")
 
 	// draw a box around the face
-	for _, b := range box {
-		b.LineWidth = 10
-	}
+	// for _, b := range box {
+	// 	b.LineWidth = 10
+	// }
 	// box.LineColor = "#ff3333"
 	ib.DrawBox("face.png", box)
 
