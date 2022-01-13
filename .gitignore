@@ -26,5 +26,4 @@
 **/.env*
 
 // img
-**/face.png
-**/out.png
+/image-box/tmp/*.png
