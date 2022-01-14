@@ -18,9 +18,15 @@ type Image struct {
 	CreationDate string `json:"creation_date"`
 }
 
+type Face struct {
+	Image           []byte `json:"image"`
+	Gender          bool   `json:"gender"`
+	Name            string `json:"name"`
+	ConfidenceLevel int    `json:"confidence_level"`
+}
 type Images struct {
 	ImageBox     []byte   `json:"image_box"`
-	Faces        [][]byte `json:"faces"`
+	Faces        []Face   `json:"faces"`
 	BoundingBox  []ib.Box `json:"bounding_box"`
 	CreationDate string   `json:"creation_date"`
 }
@@ -50,7 +56,8 @@ func UseRoutes(app *fiber.App) {
 	app.Get("/", HelloWorld)
 	app.Get("/image/:folder/:id", getImage)
 	app.Post("/upload", uploadImage)
-	app.Post("/drawbox", drawBox)
+	app.Post("/detect", detect)
+	// app.Post("/find", find)
 }
 
 func HelloWorld(c *fiber.Ctx) error {
@@ -110,7 +117,7 @@ func uploadImage(c *fiber.Ctx) error {
 	})
 }
 
-func drawBox(c *fiber.Ctx) error {
+func detect(c *fiber.Ctx) error {
 	defaultPNG := "face.png"
 	defaultOutputPNG := "out.png"
 	url := c.Query("url")
@@ -124,7 +131,7 @@ func drawBox(c *fiber.Ctx) error {
 	}
 
 	// detect the face int the image
-	box, err := ut.GetBoundingBox(ut.Fetch(url))
+	box, err := ut.GetBoundingBox(ut.Fetch(url, "face"))
 	if err != nil {
 		return c.Status(fiber.StatusAccepted).JSON(struct {
 			StatusCode  int    `json:"status_code"`
@@ -138,28 +145,51 @@ func drawBox(c *fiber.Ctx) error {
 	// download image
 	ut.DownloadImage(url, tmpDir+defaultPNG)
 
-	// draw a box around the face
-	ib.DrawBox(tmpDir+defaultPNG, box, tmpDir+defaultOutputPNG)
-
 	imageBoxData, err := ioutil.ReadFile(tmpDir + defaultOutputPNG)
 	if err != nil {
 		return err
 	}
 	// return image buffer
-	facesData := [][]byte{}
+	facesData := []Face{}
 	// crop faces
 	count := 0
-	for _, b := range box {
+	for i := 0; i < len(box); i++ {
 		count++
 		imgName := fmt.Sprintf(tmpDir+"cropped-face-%d.png", count)
-		ib.CropImage(tmpDir+defaultPNG, b, imgName)
+		ib.CropImage(tmpDir+defaultPNG, box[i], imgName)
 		data, err := ioutil.ReadFile(imgName)
 		if err != nil {
 			return err
 		}
-		facesData = append(facesData, data)
+		id := uuid.New().String()
+		imageURL := ut.UploadImage("faces", imgName, id)
+		celebName, confidenceLevel, err := ut.GetCelebrity(ut.Fetch(imageURL, "celebrity"))
+		gender, err := ut.GetGender(ut.Fetch(imageURL, "gender"))
+		facesData = append(facesData, Face{
+			Image:           data,
+			Gender:          gender,
+			Name:            celebName,
+			ConfidenceLevel: confidenceLevel,
+		})
+		switch confidenceLevel {
+		case 0:
+			box[i].LineColor = "#ff0800"
+		case 1:
+			box[i].LineColor = "#fdbe02"
+		case 2:
+			box[i].LineColor = "#0cf20e"
+		}
 		// fmt.Println("byte slice data", data)
 	}
+
+	fmt.Println(box[0].LineColor)
+	// draw a box around the face
+	ib.DrawBox(tmpDir+defaultPNG, box, tmpDir+defaultOutputPNG)
+
+	// id := uuid.New().String()
+	// ut.UploadImage("after", tmpDir+defaultOutputPNG, id)
+	// id = uuid.New().String()
+	// ut.UploadImage("before", tmpDir+defaultPNG, id)
 
 	return c.Status(fiber.StatusOK).JSON(SuccessfulDrawing{
 		StatusCode:  c.Response().StatusCode(),
