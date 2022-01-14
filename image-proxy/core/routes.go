@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"io/ioutil"
 	ut "proxy/utils"
 	"time"
@@ -17,8 +18,15 @@ type Image struct {
 	CreationDate string `json:"creation_date"`
 }
 
-type ImageBox struct {
-	URL          []byte   `json:"url"`
+type Face struct {
+	Image           []byte `json:"image"`
+	Gender          bool   `json:"gender"`
+	Name            string `json:"name"`
+	ConfidenceLevel int    `json:"confidence_level"`
+}
+type Images struct {
+	ImageBox     []byte   `json:"image_box"`
+	Faces        []Face   `json:"faces"`
 	BoundingBox  []ib.Box `json:"bounding_box"`
 	CreationDate string   `json:"creation_date"`
 }
@@ -30,9 +38,9 @@ type SuccessfulUpload struct {
 }
 
 type SuccessfulDrawing struct {
-	StatusCode  int      `json:"status_code"`
-	Description string   `json:"description"`
-	ImageBox    ImageBox `json:"image"`
+	StatusCode  int    `json:"status_code"`
+	Description string `json:"description"`
+	Images      Images `json:"images"`
 }
 
 type RequestError struct {
@@ -40,13 +48,16 @@ type RequestError struct {
 	Description string `json:"description"`
 }
 
+var tmpDir string = "tmp/"
+
 func UseRoutes(app *fiber.App) {
 	// app.Use(logger.New())
 
 	app.Get("/", HelloWorld)
 	app.Get("/image/:folder/:id", getImage)
 	app.Post("/upload", uploadImage)
-	app.Post("/drawbox", drawBox)
+	app.Post("/detect", detect)
+	// app.Post("/find", find)
 }
 
 func HelloWorld(c *fiber.Ctx) error {
@@ -106,7 +117,9 @@ func uploadImage(c *fiber.Ctx) error {
 	})
 }
 
-func drawBox(c *fiber.Ctx) error {
+func detect(c *fiber.Ctx) error {
+	defaultPNG := "face.png"
+	defaultOutputPNG := "out.png"
 	url := c.Query("url")
 
 	// check if url is given in the query param
@@ -118,7 +131,7 @@ func drawBox(c *fiber.Ctx) error {
 	}
 
 	// detect the face int the image
-	box, err := ut.GetBoundingBox(ut.Fetch(url))
+	box, err := ut.GetBoundingBox(ut.Fetch(url, "face"))
 	if err != nil {
 		return c.Status(fiber.StatusAccepted).JSON(struct {
 			StatusCode  int    `json:"status_code"`
@@ -130,27 +143,60 @@ func drawBox(c *fiber.Ctx) error {
 	}
 
 	// download image
-	ut.DownloadImage(url, "face.png")
+	ut.DownloadImage(url, tmpDir+defaultPNG)
 
-	// draw a box around the face
-	// for _, b := range box {
-	// 	b.LineWidth = 10
-	// }
-	// box.LineColor = "#ff3333"
-	ib.DrawBox("face.png", box)
-
-	// return image buffer
-	data, err := ioutil.ReadFile("out.png")
+	imageBoxData, err := ioutil.ReadFile(tmpDir + defaultOutputPNG)
 	if err != nil {
 		return err
 	}
-	// fmt.Println("byte slice data", data)
+	// return image buffer
+	facesData := []Face{}
+	// crop faces
+	count := 0
+	for i := 0; i < len(box); i++ {
+		count++
+		imgName := fmt.Sprintf(tmpDir+"cropped-face-%d.png", count)
+		ib.CropImage(tmpDir+defaultPNG, box[i], imgName)
+		data, err := ioutil.ReadFile(imgName)
+		if err != nil {
+			return err
+		}
+		id := uuid.New().String()
+		imageURL := ut.UploadImage("faces", imgName, id)
+		celebName, confidenceLevel, err := ut.GetCelebrity(ut.Fetch(imageURL, "celebrity"))
+		gender, err := ut.GetGender(ut.Fetch(imageURL, "gender"))
+		facesData = append(facesData, Face{
+			Image:           data,
+			Gender:          gender,
+			Name:            celebName,
+			ConfidenceLevel: confidenceLevel,
+		})
+		switch confidenceLevel {
+		case 0:
+			box[i].LineColor = "#ff0800"
+		case 1:
+			box[i].LineColor = "#fdbe02"
+		case 2:
+			box[i].LineColor = "#0cf20e"
+		}
+		// fmt.Println("byte slice data", data)
+	}
+
+	fmt.Println(box[0].LineColor)
+	// draw a box around the face
+	ib.DrawBox(tmpDir+defaultPNG, box, tmpDir+defaultOutputPNG)
+
+	// id := uuid.New().String()
+	// ut.UploadImage("after", tmpDir+defaultOutputPNG, id)
+	// id = uuid.New().String()
+	// ut.UploadImage("before", tmpDir+defaultPNG, id)
 
 	return c.Status(fiber.StatusOK).JSON(SuccessfulDrawing{
 		StatusCode:  c.Response().StatusCode(),
 		Description: "Box drawen successfully.",
-		ImageBox: ImageBox{
-			URL:          data,
+		Images: Images{
+			ImageBox:     imageBoxData,
+			Faces:        facesData,
 			BoundingBox:  box,
 			CreationDate: time.Now().Format("2006-01-02"),
 		},

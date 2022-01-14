@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/cloudinary/cloudinary-go v1.5.0
 	github.com/gofiber/fiber/v2 v2.24.0
-	github.com/neeejm/image-box v1.0.1
+	github.com/neeejm/image-box v1.2.0
 )
 
 require (

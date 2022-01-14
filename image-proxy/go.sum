@@ -30,6 +30,10 @@ github.com/neeejm/image-box v0.0.0-20220113113504-e89c75e66e47 h1:MnFshMH/U11qyX
 github.com/neeejm/image-box v0.0.0-20220113113504-e89c75e66e47/go.mod h1:guPlq+QSU4pNVXdPg9GoNEjwgtkBqo9DVHFxjzDHVSY=
 github.com/neeejm/image-box v1.0.1 h1:3cadLKnWk1niJFlqsG/wPthEJQZ2Xd3mz7nsyaO+0FQ=
 github.com/neeejm/image-box v1.0.1/go.mod h1:guPlq+QSU4pNVXdPg9GoNEjwgtkBqo9DVHFxjzDHVSY=
+github.com/neeejm/image-box v1.1.0 h1:bnWzhZVh9FoAiPdiDf8SNKgk9xcsUwj7e4pzMGN4o08=
+github.com/neeejm/image-box v1.1.0/go.mod h1:guPlq+QSU4pNVXdPg9GoNEjwgtkBqo9DVHFxjzDHVSY=
+github.com/neeejm/image-box v1.2.0 h1:WKrmhkK90qGOdvTBf5vNKMjfFDOj4TKKHEjUuBJVWug=
+github.com/neeejm/image-box v1.2.0/go.mod h1:guPlq+QSU4pNVXdPg9GoNEjwgtkBqo9DVHFxjzDHVSY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

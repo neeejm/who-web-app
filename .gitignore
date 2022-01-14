@@ -22,9 +22,8 @@
 **/yarn-debug.log*
 **/yarn-error.log*
 
-// golang
+# golang
 **/.env*
 
-// img
-**/face.png
-**/out.png
+# img
+image-proxy/tmp/*.png
