@@ -66,8 +66,10 @@ const Home = () => {
     })();
 
     const handleImg = (event) => {
-        if (event.target.value === "")
+        if (event.target.value === "") {
             setImgSrc("https://t3.ftcdn.net/jpg/02/57/43/20/360_F_257432094_IBWsGRGo9DXMS9glqquVlp3QQOly2UZA.jpg")
+            setFaces([])
+        }
         else {
             setImgSrc(event.target.value);
             isBuffer = false
@@ -87,8 +89,8 @@ const Home = () => {
                 // .then(result => console.log(result.outputs[0].data.regions[0].region_info.bounding_box))
                 .then(result => {
                     setIsLoading(false);
-                    // setFaces(result.images.faces)
                     setImgSrc(result.images.image_box);
+                    setFaces(result.images.faces)
                 })
                 // .then(result => console.log(result))
                 .catch(error => console.log('error', error));
