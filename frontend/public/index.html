@@ -1,1 +1,45 @@
-<div id="root"></div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who!</title>
+    <style>
+        html {
+            height: 100vh;
+            width: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            min-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <script>
+        VANTA.GLOBE({
+            el: "body",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0xb8b8dc,
+            color2: 0x2b2bcf,
+            size: 2.00,
+            backgroundColor: 0xd7d7d7
+        })
+    </script>
+</body>
+
+
+</html>

@@ -145,6 +145,8 @@ func detect(c *fiber.Ctx) error {
 	// download image
 	ut.DownloadImage(url, tmpDir+defaultPNG)
 
+	// draw a box around the face
+	ib.DrawBox(tmpDir+defaultPNG, box, tmpDir+defaultOutputPNG)
 	imageBoxData, err := ioutil.ReadFile(tmpDir + defaultOutputPNG)
 	if err != nil {
 		return err
@@ -181,10 +183,6 @@ func detect(c *fiber.Ctx) error {
 		}
 		// fmt.Println("byte slice data", data)
 	}
-
-	fmt.Println(box[0].LineColor)
-	// draw a box around the face
-	ib.DrawBox(tmpDir+defaultPNG, box, tmpDir+defaultOutputPNG)
 
 	// id := uuid.New().String()
 	// ut.UploadImage("after", tmpDir+defaultOutputPNG, id)
